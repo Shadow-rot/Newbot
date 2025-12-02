@@ -2,9 +2,7 @@
 # Licensed under the MIT License.
 # This file is part of AnonXMusic
 
-
 import pyrogram
-
 from anony import config, logger
 
 
@@ -17,7 +15,6 @@ class Bot(pyrogram.Client):
             bot_token=config.BOT_TOKEN,
             parse_mode=pyrogram.enums.ParseMode.HTML,
             max_concurrent_transmissions=7,
-            link_preview_options=pyrogram.types.LinkPreviewOptions(is_disabled=True),
         )
         self.owner = config.OWNER_ID
         self.logger = config.LOGGER_ID
@@ -38,13 +35,15 @@ class Bot(pyrogram.Client):
         self.mention = self.me.mention
 
         try:
-            await self.send_message(self.logger, "Bot Started")
+            # Send startup message with web page previews disabled
+            await self.send_message(self.logger, "Bot Started", disable_web_page_preview=True)
             get = await self.get_chat_member(self.logger, self.id)
         except Exception as ex:
             raise SystemExit(f"Bot has failed to access the log group: {self.logger}\nReason: {ex}")
 
         if get.status != pyrogram.enums.ChatMemberStatus.ADMINISTRATOR:
-            raise SystemExit("Please promote the bot as an admin in logger group.")
+            raise SystemExit("Please promote the bot as an admin in the logger group.")
+
         logger.info(f"Bot started as @{self.username}")
 
     async def exit(self):
